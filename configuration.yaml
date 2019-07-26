@@ -1,0 +1,197 @@
+---
+
+# comments possible with yaml
+
+glidein:
+  advertise_delay: 5
+  factory_name: factory-dstrain
+  glidein_name: v2_4
+  loop_delay: 60
+  restart_atttempts: 3
+  restart_interval: 1800
+  schedd_name: schedd_glideins1@submit.fnal.gov, schedd_glideins2@submit.fnal.gov
+
+log_retention:
+  condor_logs:
+    max_days: 14.0
+    max_mbytes: 100.0
+    min_days: 3.0
+  job_logs:
+    max_days: 7.0
+    max_mbytes: 100.0
+    min_days: 3.0
+  process_logs:
+    - extension: info
+      max_days: 7.0
+      max_mbytes: 100.0
+      min_days: 3.0
+      msg_types: INFO
+    - extension: debug
+      max_days: 7.0
+      max_mbytes: 100.0
+      min_days: 3.0
+      msg_types: DEBUG, ERR, WARN
+  summary_logs:
+    max_days: 31.0
+    max_mbytes: 100.0
+    min_days: 3.0
+
+monitor:
+  base_dir: /var/www/html/glidefactory/monitor
+  flot_dir: /opt/javascriptrrd-0.6.1/flot
+  javascriptRRD_dir: /opt/javascriptrrd-0.6.1/src/lib
+  jquery_dir: /opt/javascriptrrd-0.6.1/flot
+
+monitor_footer:
+  display_txt: Legal Disclaimer
+  href_link: /site/disclaimer.html
+
+security:
+  key_length: 2048
+  pub_key: RSA
+  reuse_oldkey_onstartup_gracetime: 900
+  remove_old_cred_freq: 24
+  remove_old_cred_age: 30
+  frontends:
+    - name: vofrontend
+      identity: vofrontend@vofrontend.fnal.gov
+      security_classes:
+        - name: frontend
+          username: frontend1
+
+stage:
+  base_dir: /var/www/html/glidefactory/stage
+  use_symlink: True
+  web_base_url: http://factory.fnal.gov:9000/glidefactory/stage
+
+submit:
+  base_client_log_dir: /opt/clientlogs/clients/logs
+  base_client_proxies_dir: /opt/clientlogs/clients/proxies
+  base_dir: /opt/wmsfactory/
+  base_log_dir: /opt/wmsfactory//logs
+
+attributes: # list of attribute
+  - name: CONDOR_VERSION
+    const: True
+    glidein_publish: False
+    job_publish: False
+    parameter: True
+    publish: False
+    type: string
+    value: default
+  - name: GCB_ORDER
+    const: True
+    glidein_publish: True
+    job_publish: False
+    parameter: True
+    publish: True
+    type: string
+    value: NONE
+  - name: GLEXEC_JOB
+    const: True
+    glidein_publish: False
+    job_publish: False
+    parameter: True
+    publish: True
+    type: string
+    value: True
+  - name: USE_CCB
+    const: True
+    glidein_publish: True
+    job_publish: False
+    parameter: True
+    publish: True
+    type: string
+    value: False
+  - name: USE_MATCH_AUTH
+    const: False
+    glidein_publish: False
+    job_publish: False
+    parameter: True
+    publish: True
+    type: string
+    value: True
+
+entries:
+  - name: EXAMPLE_ENTRY
+    enabled: True
+    auth_method: grid_proxy
+    trust_domain: OSG
+    gatekeeper: gatewayname.fnal.gov/jobmanager-condor
+    gridtype: gt2
+    rsl: (queue=default)(jobtype=single)
+    schedd_name: wmscollector.fnal.gov
+    verbosity: std
+    work_dir: OSG
+    config:
+      max_jobs:
+        per_entry:
+          held: 1000
+          idle: 2000
+          glideins: 10000
+        default_per_frontend:
+          held: 50
+          idle: 100
+          glideins: 5000
+        per_frontends:
+      release:
+        max_per_cycle: 20
+        sleep: 0.2
+      remove:
+        max_per_cycle: 5
+        sleep: 0.2
+      submit:
+        cluster_size: 10
+        max_per_cycle: 100
+        sleep: 0.2
+        slots_layout: single_slot
+    allow_frontends:
+    attributes:
+      - name: CONDOR_ARCH
+        const: True
+        glidein_publish: False
+        job_publish: False
+        parameter: True
+        publish: False
+        type: string
+        value: default
+      - name: CONDOR_OS
+        const: True
+        glidein_publish: False
+        job_publish: False
+        parameter: True
+        publish: False
+        type: string
+        value: default
+      - name: GLEXEC_BIN
+        const: True
+        glidein_publish: False
+        job_publish: False
+        parameter: True
+        publish: False
+        type: string
+        value: NONE
+      - name: GLIDEIN_Site
+        const: True
+        glidein_publish: True
+        job_publish: True
+        parameter: True
+        publish: True
+        type: string
+        value: FNAL_EXAMPLE_SITE
+    monitorgroups:
+    files:
+    infosys_refs:
+
+condor_tarballs:
+  - arch: default
+    base_dir: /opt/wmscollector/
+    os: default
+    tar_file: /var/www/html/glidefactory/stage/glidein_v2_4/condor_bin_default-default-default.a83ePm.tgz
+    version: default
+
+files:
+
+
+
+
