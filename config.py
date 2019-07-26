@@ -1,36 +1,60 @@
 #!/usr/bin/env python
-
 import yaml
 
-stream = open('configuration.yaml', 'r')
-configuration = yaml.safe_load(stream)
 
-
-class ConfigElement:
-    def __init__(self, config):
-        self.config = config
-        self.key_set = set(config.keys())
-
-    def verify(self):
-        raise ConfigError("Something is wrong in the configuration")
-
-
-class ConfigList(ConfigElement):
+# Error classes
+class Error(Exception):
     pass
 
 
-class ConfigDict(ConfigList):
-    mandatory_keys = {}
-    optional_keys = {}
+class ConfigError(Error):
+    def __init__(self, message):
+        super(ConfigError, self).__init__("Configutation error: %s" % message)
+
+
+# Config elements
+class ConfigElement:
+    def __init__(self, config):
+        self.config = config
 
     def verify(self):
-        pass
+        raise ConfigError("Undefined verify method")
+
+
+class ConfigList(ConfigElement):
+    """List of ConfigElements
+    """
+    def verify(self):
+        for i in self.config:
+            i.verify()
+
+
+class ConfigDict(ConfigList):
+    """Dictionary of ConfigElements
+    """
+    mandatory_keys = frozenset()
+    optional_keys = frozenset()
+
+    def __init__(self, config):
+        super(ConfigDict, self).__init__(config)
+        self.key_set = frozenset(config)
+
+    def verify(self):
+        # verify that all mandatory keys are there
+        if self.mandatory_keys <= self.key_set:
+            raise ConfigError("mandatory key/s %s not in dictionary %s" %
+                              (self.mandatory_keys-self.key_set, self.config))
+        # verify that there is no unknown key (unless fre-form is OK)
+        # TODO:  add verify that there is no unknown key
+        # verify all items
+        for i in self.config:
+            self.config[i].verify()
 
 
 class ConfigAll(ConfigDict):
-    mandatory_keys = {'entries', 'log_retention', 'monitor', 'monitor_footer',
-                      'security', 'stage', 'submit', 'glidein', 'condor_tarballs'}
-    optional_keys = {'files', 'attributes'}
+    mandatory_keys = frozenset(('entries', 'log_retention', 'monitor', 'monitor_footer',
+                                'security', 'stage', 'submit', 'glidein', 'condor_tarballs'))
+    optional_keys = frozenset(('files', 'attributes'))
 
     def verify(self):
         if self.mandatory_keys | self.optional_keys == self.key_set:
@@ -41,16 +65,13 @@ class ConfigAll(ConfigDict):
             raise ConfigError('Missing mandatory key(s)')
 
 
-class Error(Exception):
-    pass
+# Execute only if not imported
+if __name__ == "__main__":
+    stream = open('configuration.yaml', 'r')
+    configuration = yaml.safe_load(stream)
 
+    myconf = ConfigElement(configuration)
+    myall = ConfigAll(configuration)
 
-class ConfigError(Error):
-    pass
-
-
-myconf = ConfigElement(configuration)
-myall = ConfigAll(configuration)
-
-myall.verify()
+    myall.verify()
 
